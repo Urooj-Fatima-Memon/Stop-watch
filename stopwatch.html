@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            text-align: center;     
+        margin-top: 10px;
+         
+        }
+        .stopwatch {
+            background-color: #1f1f1f;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            width: 20% ;
+            align-items: center;
+            justify-content: center !important;
+        }
+
+        .time {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #ff6b6b;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #ff4f4f;
+        }
+
+        .laps {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="stopwatch">
+        <div class="time " id="display">00:00:00</div>
+        <div class="buttons">
+            <button onclick="startStop()" id="startStop">Start</button>
+            <button onclick="reset()" id="reset">Reset</button>
+            <button onclick="recordLap()" id="lap">Lap</button>
+        </div>
+    </div>
+    <ul class="laps" id="laps"></ul>
+
+    <script>
+        let isRunning = false;
+        let startTime;
+        let lapTime = 0;
+        let laps = [];
+
+        function startStop() {
+            if (!isRunning) {
+                isRunning = true;
+                startTime = Date.now() - lapTime;
+                document.getElementById("startStop").textContent = "Stop";
+                update();
+            } else {
+                isRunning = false;
+                lapTime = Date.now() - startTime;
+                document.getElementById("startStop").textContent = "Start";
+            }
+        }
+
+        function reset() {
+            isRunning = false;
+            lapTime = 0;
+            document.getElementById("startStop").textContent = "Start";
+            document.getElementById("display").textContent = "00:00:00";
+            laps = [];
+            updateLaps();
+        }
+
+        function recordLap() {
+            if (isRunning) {
+                laps.push(formatTime(lapTime));
+                lapTime = 0;
+                updateLaps();
+            }
+        }
+
+        function update() {
+            if (isRunning) {
+                lapTime = Date.now() - startTime;
+                document.getElementById("display").textContent = formatTime(lapTime);
+                requestAnimationFrame(update);
+            }
+        }
+
+        function formatTime(time) {
+            const date = new Date(time);
+            const minutes = date.getUTCMinutes();
+            const seconds = date.getSeconds();
+            const milliseconds = date.getUTCMilliseconds();
+            return (
+                String(minutes).padStart(2, "0") +
+                ":" +
+                String(seconds).padStart(2, "0") +
+                ":" +
+                String(milliseconds).padStart(3, "0")
+            );
+        }
+
+        function updateLaps() {
+            const lapList = document.getElementById("laps");
+            lapList.innerHTML = "";
+            laps.forEach((lap, index) => {
+                const lapItem = document.createElement("li");
+                lapItem.textContent = `Lap ${index + 1}: ${lap}`;
+                lapList.appendChild(lapItem);
+            });
+        }
+    </script>
+</body>
+</html>
